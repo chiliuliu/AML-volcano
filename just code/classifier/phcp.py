@@ -62,7 +62,9 @@ def phcp(PATH, name_experiment, logger, subpath, X, Y):
 
     logger.info("Started Boruta on the split")
 
-    X_train, features_list = boruta_feature_selection(X, Y) #X.values
+    # X_train, features_list = boruta_feature_selection(X, Y) #X.values
+    X_train=X
+    features_list=['no feature names given']
 
     # Setting up the HO dataframe to save the results from all the HO iterations
     df_columns = [
@@ -165,9 +167,9 @@ def phcp(PATH, name_experiment, logger, subpath, X, Y):
         eval_type="dict",
         acquisition_fun="MGFI",
         minimize=False,
-        n_job=1,  # number of processes
+        n_job=-1,  # number of processes
         n_point=3,  # number of the candidate solution proposed in each iteration
-        verbose=True,  # turn this off, if you prefer no output
+        verbose=False,  # turn this off, if you prefer no output
     )
 
     if ct.to_optimize:
@@ -214,7 +216,7 @@ def phcp(PATH, name_experiment, logger, subpath, X, Y):
         # Fitting the pipeline on the training fold
         X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size = 0.10, random_state = 5)
 
-        ada = ADASYN(random_state=42)
+        ada = BorderlineSMOTE(random_state=42)
         X_smo, y_smo = ada.fit_resample(X_train, y_train)
 
         rf.fit(X_smo, y_smo)
